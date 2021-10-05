@@ -19,7 +19,7 @@ class CreateCategoriasTable extends Migration
             $table->text('texto')->nullable();
             $table->text('url');
             $table->integer('ordem');
-            $table->booblean('bloqueio')->default(0);
+            $table->boolean('bloqueio')->default(0);
             $table->timestamps();
         });
     }
