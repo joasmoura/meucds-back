@@ -65,24 +65,29 @@ class SiteController extends Controller
     }
 
     public function artista($url, Artistas $model){
-        $artista = $model->with('cds')->where('url',$url)->first();
+        $artista = $model->where('url',$url)->first();
         $musicas = [];
         if($artista){
             $artista->foto = $artista->foto('img700');
-            $cds = $artista->cds()->with('musicas')->get();
-            if($cds->first()){
-                foreach($cds as $cd){
+            $cds = $artista->cds()->get();
+            if($cds){
+                foreach($cds as $key => $cd){
+                    $cd->capa_mini = $cd->capa_mini;
                     $mus = $cd->musicas()->get();
                     if($mus->first()){
-                        foreach($mus as $musica){
+                        foreach($mus as $keym => $musica){
                             if($musica->link_musica){
                                 $musica->link_musica = $musica->link_musica;
-                                array_push($musicas, $musica);
+                                $mus[$keym] = $musica;
+                            }else{
+                                unset($mus[$keym]);
                             }
                         }
+                        $cds[$key]->musicas = $mus;
                     }
+
+                    $artista->cds = $cds;
                 }
-                $artista->musicas = $musicas;
             }
             return compact('artista');
         }else{
