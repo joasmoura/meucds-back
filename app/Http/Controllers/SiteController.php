@@ -67,13 +67,24 @@ class SiteController extends Controller
     public function artista($url, Artistas $model){
         $artista = $model->where('url',$url)->first();
         $musicas = [];
+        $publicidade = [];
+
         if($artista){
             $artista->foto = $artista->foto('img700');
-            $cds = $artista->cds()->get();
+            $cds = $artista->cds()->with('publicidade')->get();
+
             if($cds){
                 foreach($cds as $key => $cd){
                     $cd->capa_mini = $cd->capa_mini;
                     $mus = $cd->musicas()->get();
+
+                    if($cd->publicidade()->first()){
+                        foreach($cd->publicidade()->get() as $pub){
+
+                            array_push($publicidade, $pub);
+                        }
+                    }
+
                     if($mus->first()){
                         foreach($mus as $keym => $musica){
                             if($musica->link_musica){
@@ -89,7 +100,7 @@ class SiteController extends Controller
                     $artista->cds = $cds;
                 }
             }
-            return compact('artista');
+            return compact('artista','publicidade');
         }else{
             return response()->json([
                 'status' => false,

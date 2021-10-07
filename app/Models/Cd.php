@@ -17,4 +17,8 @@ class Cd extends Model
     public function getCapaMiniAttribute(){
         return (!empty($this->img) ? (Storage::disk('public')->exists("cds/img240/".$this->img) ? Storage::url("cds/img240/".$this->img) : '') : '');
     }
+
+    public function publicidade(){
+        return $this->hasMany(Publicidade::class, 'cd_id','id');
+    }
 }

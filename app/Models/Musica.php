@@ -12,6 +12,5 @@ class Musica extends Model
 
     public function getLinkMusicaAttribute(){
         return (!empty($this->link) ? (Storage::disk('public')->exists('musicas/'.$this->link) ? Storage::url('musicas/'.$this->link) : '') : '');
-        // return Storage::url('musicas/'.$this->link);
     }
 }
