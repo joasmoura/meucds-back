@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Banner;
 use App\Models\Artistas;
 use App\Models\Categoria;
+use App\Models\Cd;
 use App\Models\Musica;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
+use ZipArchive;
 
 class SiteController extends Controller
 {
@@ -76,11 +79,13 @@ class SiteController extends Controller
             if($cds){
                 foreach($cds as $key => $cd){
                     $cd->capa_mini = $cd->capa_mini;
+                    $cd->num_download += $cd->downloads()->sum('num_download');
+                    $cd->num_play += $cd->reproducoes()->sum('num_play');
                     $mus = $cd->musicas()->get();
 
-                    if($cd->publicidade()->first()){
-                        foreach($cd->publicidade()->get() as $pub){
-
+                    $publicidades= $cd->publicidade()->get();
+                    if($publicidades->first()){
+                        foreach($publicidades as $pub){
                             array_push($publicidade, $pub);
                         }
                     }
@@ -121,5 +126,81 @@ class SiteController extends Controller
                 $m->save();
             }
         }
+    }
+
+    public function baixarCd(Request $request){
+        $zip = new ZipArchive();
+        $name = $request->cd.'.zip';
+        $zipPath = public_path('/downloads'.DIRECTORY_SEPARATOR.$name);
+
+        $artista = Artistas::where('url',$request->artista)->first();
+        
+        if($artista){
+            $cd = $artista->cds()->where('url', $request->cd)->first();
+            
+            if($cd){
+                $musica = $cd->musicas()->first();
+                
+                if($musica){
+                    $explode = explode('/',$musica->link);
+                    $pasta = public_path('storage'.DIRECTORY_SEPARATOR.'musicas'.DIRECTORY_SEPARATOR.$explode[0]);
+                    
+                    if ($zip->open($zipPath, ZipArchive::CREATE) > 0){
+                        $files = File::files($pasta);
+                        foreach ($files as $key => $value) {
+                            $relativeNameInZipFile = basename($value);
+
+                            // adicionar arquivo ao zip
+                            $zip->addFile($value, $relativeNameInZipFile);
+                        }
+
+                        // concluir a operacao
+                        $zip->close();
+                    }
+
+                    return response()->download($zipPath);
+                }
+            }
+        }
+    }
+
+    public function contaDownloadCd($id) {
+        $cd = Cd::find($id);
+        $qtd = 0;
+        if($cd){
+            $download = $cd->downloads()->first();
+            if($download){
+                $qtd = $cd->downloads()->sum('num_download') + 1;
+                $qtd += $cd->num_download;
+                $download->num_download += 1;
+                $download->save();
+            }else{
+                $qtd = $cd->num_download + 1;
+                $cd->downloads()->create([
+                    'num_download' => 1
+                ]);
+            }
+        }
+        return $qtd;
+    }
+
+    public function contaPlayCd($id){
+        $cd = Cd::find($id);
+        $qtd = 0;
+        if($cd){
+            $play = $cd->reproducoes()->first();
+            if($play){
+                $qtd = $cd->reproducoes()->sum('num_play') + 1;
+                $qtd += $cd->num_play;
+                $play->num_play += 1;
+                $play->save();
+            }else{
+                $qtd = $cd->num_play + 1;
+                $cd->reproducoes()->create([
+                    'num_play' => 1
+                ]);
+            }
+        }
+        return $qtd;
     }
 }

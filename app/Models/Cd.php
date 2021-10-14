@@ -21,4 +21,12 @@ class Cd extends Model
     public function publicidade(){
         return $this->hasMany(Publicidade::class, 'cd_id','id');
     }
+
+    public function downloads(){
+        return $this->hasMany(Downloads_cd::class, 'cd_id','id');
+    }
+
+    public function reproducoes(){
+        return $this->hasMany(Plays_cd::class, 'cd_id','id');
+    }
 }

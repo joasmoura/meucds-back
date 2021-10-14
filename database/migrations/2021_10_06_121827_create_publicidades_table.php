@@ -16,7 +16,7 @@ class CreatePublicidadesTable extends Migration
         Schema::create('publicidades', function (Blueprint $table) {
             $table->id();
             $table->string('titulo');
-            $table->enum('origem',['local','youtube']);
+            $table->enum('origem',['video/mp4','youtube']);
             $table->string('src')->nullable();
             $table->text('link')->nullable();
             $table->unsignedBigInteger('cd_id');

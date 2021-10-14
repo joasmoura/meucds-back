@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +20,10 @@ Route::get('/banners',[SiteController::class, 'banners']);
 Route::get('/categorias',[SiteController::class, 'categorias']);
 Route::get('/artistas',[SiteController::class, 'artistas']);
 Route::get('/artista/{url}',[SiteController::class, 'artista']);
+
+Route::get('/baixar-cd',[SiteController::class, 'baixarCd']);
+Route::get('/conta-download-cd/{id}',[SiteController::class, 'contaDownloadCd']);
+Route::get('/conta-play-cd/{id}',[SiteController::class, 'contaPlayCd']);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

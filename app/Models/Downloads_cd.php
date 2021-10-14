@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Downloads_cd extends Model
 {
     use HasFactory;
+
+    protected $fillable= ['num_download', 'cd_id'];
 }
