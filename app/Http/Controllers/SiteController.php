@@ -93,6 +93,7 @@ class SiteController extends Controller
                     if($mus->first()){
                         foreach($mus as $keym => $musica){
                             if($musica->link_musica){
+                                $musica->url = $artista->url.'/'.$cd->url.'/'.$musica->url;
                                 $musica->link_musica = $musica->link_musica;
                                 $mus[$keym] = $musica;
                             }else{
