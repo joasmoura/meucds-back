@@ -18,6 +18,7 @@ class CreateArtistasTable extends Migration
             $table->string('nome');
             $table->text('detalhes')->nullable();
             $table->string('img');
+            $table->string('capa')->nullable();
             $table->string('url');
             $table->integer('ordem');
             $table->boolean('bloqueio')->default(0);

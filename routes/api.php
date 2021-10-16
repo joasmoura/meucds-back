@@ -20,6 +20,7 @@ Route::get('/banners',[SiteController::class, 'banners']);
 Route::get('/categorias',[SiteController::class, 'categorias']);
 Route::get('/artistas',[SiteController::class, 'artistas']);
 Route::get('/artista/{url}',[SiteController::class, 'artista']);
+Route::get('/artistas-letra/{letra}',[SiteController::class, 'artistas_letra']);
 
 Route::get('/baixar-cd',[SiteController::class, 'baixarCd']);
 Route::get('/conta-download-cd/{id}',[SiteController::class, 'contaDownloadCd']);

@@ -17,6 +17,7 @@ class CreateCategoriasTable extends Migration
             $table->id();
             $table->string('nome');
             $table->text('texto')->nullable();
+            $table->string('icone')->nullable();
             $table->text('url');
             $table->integer('ordem');
             $table->boolean('bloqueio')->default(0);

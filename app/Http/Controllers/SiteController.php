@@ -44,6 +44,13 @@ class SiteController extends Controller
 
     public function categorias(){
         $categorias = Categoria::where('bloqueio',0)->get();
+
+        if($categorias){
+            foreach($categorias as $key => $categoria){
+                $categorias[$key]['icone'] = $categoria->icon;
+            }
+        }
+
         return $categorias;
     }
 
@@ -114,8 +121,19 @@ class SiteController extends Controller
         }
     }
 
-    public function musicas_artista(Request $request){
+    public function artistas_letra($letra, Artistas $model){
+        $artistas = $model->where([
+            ['bloqueio','0'],
+            ['nome' ,'like', $letra.'%']
+        ])->paginate(32);
 
+        if($artistas->first()){
+            foreach($artistas as $key => $artista){
+                $artistas[$key]['foto'] = $artista->foto('img200');
+            }
+        }
+
+        return $artistas;
     }
 
     public function atualizanomemusicas(){
