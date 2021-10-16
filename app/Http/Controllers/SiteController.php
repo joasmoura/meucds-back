@@ -44,10 +44,9 @@ class SiteController extends Controller
 
     public function categorias(){
         $categorias = Categoria::where('bloqueio',0)->get();
-
         if($categorias){
             foreach($categorias as $key => $categoria){
-                $categorias[$key]['icone'] = $categoria->icon;
+                $categorias[$key]['img'] = $categoria->img;
             }
         }
 

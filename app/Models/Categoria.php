@@ -10,6 +10,8 @@ class Categoria extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['nome','icone', 'texto','url','ordem','bloqueio'];
+
     public function artistas(){
         return $this->hasMany(Artistas::class,'categoria_id','id');
     }
@@ -18,7 +20,7 @@ class Categoria extends Model
         return $this->hasMany(Banner::class, 'categoria_id','id');
     }
 
-    public function getIconAttribute(){
-        return ($this->icone ? (Storage::disk('public')->exists("categorias/".$this->icone) ? Storage::url("categorias/".$this->icone) : '') : '');
+    public function getImgAttribute(){
+        return (!empty($this->icone) ? (Storage::disk('public')->exists('categorias/'.$this->icone) ? Storage::url('categorias/'.$this->icone) : '') : '');
     }
 }
