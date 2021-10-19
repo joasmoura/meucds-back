@@ -30,7 +30,6 @@ class recuperarSenha extends Mailable
      */
     public function build()
     {
-        // return $this->view('mail.emailRecuperacao');
         $usuario = $this->usuario;
         $this->subject('Alteração de senha');
         $this->to($usuario->email, $usuario->name);

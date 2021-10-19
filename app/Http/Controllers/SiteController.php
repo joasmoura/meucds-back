@@ -227,11 +227,9 @@ class SiteController extends Controller
 
     public function recuperarSenha(Request $request) {
         $usuario = User::where('email', $request->email)->first();
-        // return new recuperarSenha($usuario);
         
         if($usuario){
-            $enviado = Mail::send(new recuperarSenha($usuario));
-            dd($enviado);
+            Mail::send(new recuperarSenha($usuario));            
             return response()->json([
                 'status' => true
              ],Response::HTTP_OK);
