@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\UsuarioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,9 +28,16 @@ Route::get('/baixar-cd',[SiteController::class, 'baixarCd']);
 Route::get('/conta-download-cd/{id}',[SiteController::class, 'contaDownloadCd']);
 Route::get('/conta-play-cd/{id}',[SiteController::class, 'contaPlayCd']);
 
+Route::post('/login', [LoginController::class, 'entrar']);
+Route::post('/registrar', [UsuarioController::class, 'registrar']);
+Route::post('/recuperar-senha', [UsuarioController::class, 'recuperarSenha']);
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Route::middleware('auth:api')->group(function(){
+// });
 
 //rotas de atualizações temporárias de implantação
 
