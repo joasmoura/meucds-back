@@ -38,16 +38,5 @@ class UsuarioController extends Controller
         }
     }
 
-    public function recuperarSenha(Request $request) {
-        $usuario = User::where('email', $request->email)->first();
-        if($usuario){
-            return response()->json([
-                'status' => true
-             ],Response::HTTP_OK);
-        }else{
-            return response()->json([
-                'status' => false
-             ],Response::HTTP_OK);
-        }
-    }
+    
 }

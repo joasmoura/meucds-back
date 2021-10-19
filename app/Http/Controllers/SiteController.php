@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\recuperarSenha;
 use App\Models\Banner;
 use App\Models\Artistas;
 use App\Models\Categoria;
 use App\Models\Cd;
 use App\Models\Musica;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 use ZipArchive;
@@ -220,5 +223,22 @@ class SiteController extends Controller
             }
         }
         return $qtd;
+    }
+
+    public function recuperarSenha(Request $request) {
+        $usuario = User::where('email', $request->email)->first();
+        // return new recuperarSenha($usuario);
+        
+        if($usuario){
+            $enviado = Mail::send(new recuperarSenha($usuario));
+            dd($enviado);
+            return response()->json([
+                'status' => true
+             ],Response::HTTP_OK);
+        }else{
+            return response()->json([
+                'status' => false
+             ],Response::HTTP_OK);
+        }
     }
 }

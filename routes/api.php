@@ -23,6 +23,7 @@ Route::get('/categorias',[SiteController::class, 'categorias']);
 Route::get('/artistas',[SiteController::class, 'artistas']);
 Route::get('/artista/{url}',[SiteController::class, 'artista']);
 Route::get('/artistas-letra/{letra}',[SiteController::class, 'artistas_letra']);
+Route::post('/recuperar-senha', [SiteController::class, 'recuperarSenha']);
 
 Route::get('/baixar-cd',[SiteController::class, 'baixarCd']);
 Route::get('/conta-download-cd/{id}',[SiteController::class, 'contaDownloadCd']);
@@ -30,10 +31,19 @@ Route::get('/conta-play-cd/{id}',[SiteController::class, 'contaPlayCd']);
 
 Route::post('/login', [LoginController::class, 'entrar']);
 Route::post('/registrar', [UsuarioController::class, 'registrar']);
-Route::post('/recuperar-senha', [UsuarioController::class, 'recuperarSenha']);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::get('/test', function (){
+    $big = '8';
+
+    $small = &$big;
+
+    $small = "4$small";
+
+    echo "$big, $small";
 });
 
 // Route::middleware('auth:api')->group(function(){
