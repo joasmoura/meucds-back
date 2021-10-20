@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Mail\recuperarSenha;
+use App\Mail\sucessoRecupercaoSenha;
 use App\Models\Banner;
 use App\Models\Artistas;
 use App\Models\Categoria;
 use App\Models\Cd;
 use App\Models\Musica;
+use App\Models\PasswordReset;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
@@ -229,14 +232,77 @@ class SiteController extends Controller
         $usuario = User::where('email', $request->email)->first();
         
         if($usuario){
-            Mail::send(new recuperarSenha($usuario));            
-            return response()->json([
-                'status' => true
-             ],Response::HTTP_OK);
+            $reset = PasswordReset::create([
+                'email' => $request->email,
+                'token' => Str::random(60)
+            ]);
+
+            if($reset){
+                Mail::send(new recuperarSenha($usuario, $reset->token));            
+                return response()->json([
+                    'status' => true
+                 ],Response::HTTP_OK);
+            }
+        }
+
+        return response()->json(Response::HTTP_NOT_FOUND);
+    }
+
+    public function verificaTokenRecuperaSenha(Request $request){
+        $passwordReset = PasswordReset::where('token', $request->token)->first();
+
+        if($passwordReset){
+            if(Carbon::parse($passwordReset->created_at)->addMinutes(720)->isPast()){
+                $passwordReset->delete();
+                return response()->json([
+                    'mensagem' => 'Parâmetro de redefinição incorreto! Tente recuperar sua senha novamente!'
+                ],Response::HTTP_NOT_FOUND);
+            }else{
+                return response()->json([
+                    'reset' => $passwordReset
+                 ],Response::HTTP_OK);
+            }
         }else{
             return response()->json([
-                'status' => false
-             ],Response::HTTP_OK);
+                'mensagem' => 'Parâmetro de redefinição incorreto! Tente recuperar sua senha novamente!'
+            ],Response::HTTP_NOT_FOUND);
         }
+    }
+
+    public function confirmarResetSenha(Request $request){
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string|confirmed',
+            'token' => 'required|string'
+        ]);
+
+        $passwordReset = PasswordReset::where([
+            ['token', $request->token],
+            ['email', $request->email]
+        ])->first();
+
+        if(!$passwordReset){
+            return response()->json([
+                'mensagem' => 'Parâmetro de redefinição incorreto! Tente recuperar sua senha novamente!'
+            ],Response::HTTP_NOT_FOUND);
+        }
+
+        $usuario = User::where('email', $passwordReset->email)->first();
+        if (!$usuario){
+            return response()->json([
+                'mensagem' => 'Não foi possível encontrar um usuário com este email!'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $usuario->password = bcrypt($request->password);
+        $usuario->save();
+
+        $passwordReset->delete();
+
+        Mail::send(new sucessoRecupercaoSenha($usuario));
+
+        return response()->json([
+            'status' => true
+        ],Response::HTTP_OK);
     }
 }

@@ -24,6 +24,8 @@ Route::get('/artistas',[SiteController::class, 'artistas']);
 Route::get('/artista/{url}',[SiteController::class, 'artista']);
 Route::get('/artistas-letra/{letra}',[SiteController::class, 'artistas_letra']);
 Route::post('/recuperar-senha', [SiteController::class, 'recuperarSenha']);
+Route::post('/verifica-token-recupera-senha', [SiteController::class, 'verificaTokenRecuperaSenha']);
+Route::post('/confirmar-alteracao-senha', [SiteController::class, 'confirmarResetSenha']);
 
 Route::get('/baixar-cd',[SiteController::class, 'baixarCd']);
 Route::get('/conta-download-cd/{id}',[SiteController::class, 'contaDownloadCd']);

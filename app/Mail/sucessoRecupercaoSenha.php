@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class recuperarSenha extends Mailable
+class sucessoRecupercaoSenha extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -16,13 +16,11 @@ class recuperarSenha extends Mailable
      *
      * @return void
      */
+    protected $usuario;
 
-     protected $usuario;
-     protected $token;
-    public function __construct($usuario, $token)
+    public function __construct($usuario)
     {
         $this->usuario = $usuario;
-        $this->token = $token;
     }
 
     /**
@@ -32,11 +30,10 @@ class recuperarSenha extends Mailable
      */
     public function build()
     {
-        $usuario = $this->usuario;
-        $url = env('APP_URL_FRONT').'login/'.$this->token;
 
+        $usuario = $this->usuario;
         $this->subject('Alteração de senha');
         $this->to($usuario->email, $usuario->name);
-        return $this->markdown('mail.emailRecuperacao', compact('usuario','url'));
+        return $this->markdown('mail.sucessoRecuperacaoSenha', compact('usuario'));
     }
 }
