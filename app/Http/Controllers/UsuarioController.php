@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class UsuarioController extends Controller
@@ -17,8 +18,18 @@ class UsuarioController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password)
         ]);
-
+        
         if($criado) {
+            if($request->file('foto')):
+                $extensao = '.'.$request->file('foto')->getClientOriginalExtension();
+                $nome = Str::slug($request->name).$extensao;
+                $upload = $request->file('foto')->storeAs('usuarios/perfil',$nome,'public');
+                if($upload){
+                    $criado->foto_usuario = $nome;
+                    $criado->save();
+                }
+            endif;
+
             if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
                 $user = auth()->user();
                 return response()->json([
@@ -27,6 +38,7 @@ class UsuarioController extends Controller
                     'authenticationToken' => $user->createToken($request->email)->accessToken
                 ],Response::HTTP_OK);
             }
+            
             
             return response()->json([
                 'status' => true
