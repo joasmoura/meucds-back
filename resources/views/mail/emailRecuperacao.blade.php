@@ -1,4 +1,5 @@
 @component('mail::message')
+
 Olá <b>{{(isset($usuario) ? $usuario->name : 'Fulano')}}</b>, foi solicitado uma alteração de senha para acesso à nossa plataforma com o email <b>{{(isset($usuario) ? $usuario->email : 'Email')}}</b>. 
 Clique no link abaixo para poder trocar sua senha.
 

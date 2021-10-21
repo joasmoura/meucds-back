@@ -1,4 +1,5 @@
 @component('mail::message')
+
 Olá <b>{{(isset($usuario) ? $usuario->name : 'Fulano')}}</b>, sua senha foi atualizada com sucesso para o email <b>{{(isset($usuario) ? $usuario->email : 'Email')}}</b>. 
 Clique no link abaixo para acessar sua área.
 
