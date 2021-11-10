@@ -25,7 +25,7 @@ class UsuarioFormRequest extends FormRequest
     public function rules()
     {
         return [
-            'password' => 'required_with_all: email, name|min: 6',
+            'password' => 'filled|min: 6',
             'email' => [
                 'required_with_all:name',
                 Rule::unique('users', 'email')->ignore($this->id),
@@ -38,8 +38,9 @@ class UsuarioFormRequest extends FormRequest
     public function messages()
     {
         return [
+            'email.unique' => 'Já existe um usuário cadastrado com o email informado, tente outro endereço de email!',
             'password.min' => 'A senha precisa ter no mínimo 6 carácteres!',
-            'password.required_with_all' => 'Digite a senha!',
+            'password.filled' => 'Digite sua senha!',
             'email.required_with_all' => 'Digite o seu endereço de email!',
             'name.required' => 'Digite o seu nome!',
         ];

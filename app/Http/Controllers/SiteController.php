@@ -60,7 +60,7 @@ class SiteController extends Controller
     }
 
     public function artistas(Request $request, Artistas $model){
-        if(isset($request->categoria) && !empty($request->categoria)){
+        if(!empty($request->categoria)){
             $categoria = Categoria::where('url',$request->categoria)->first();
 
             if($categoria){

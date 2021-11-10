@@ -9,13 +9,18 @@ use Illuminate\Support\Facades\Storage;
 class Cd extends Model
 {
     use HasFactory;
+    protected $table = 'cds';
+    protected $fillable = [
+        'artista', 'titulo', 'youtube', 'categoria_id', 'texto', 'img', 'status', 'url', 'data_publicacao',
+        'data_lancamento', 'lancamento', 'hora_publicacao', 'publicacao', 'tipo_publicacao', 'user_id'
+    ];
 
     public function musicas(){
         return $this->hasMany(Musica::class, 'cd_id','id');
     }
 
     public function getCapaMiniAttribute(){
-        return (!empty($this->img) ? (Storage::disk('public')->exists("cds/img240/".$this->img) ? Storage::url("cds/img240/".$this->img) : '') : '');
+        return (!empty($this->img) ? (Storage::disk('public')->exists("cds/".$this->img) ? Storage::url("cds/".$this->img) : '') : '');
     }
 
     public function publicidade(){
@@ -28,5 +33,9 @@ class Cd extends Model
 
     public function reproducoes(){
         return $this->hasMany(Plays_cd::class, 'cd_id','id');
+    }
+
+    public function user(){
+        return $this->hasOne(User::class, 'id','user_id');
     }
 }

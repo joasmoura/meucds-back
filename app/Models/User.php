@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
@@ -21,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'tipo',
+        'url'
     ];
 
     /**
@@ -41,4 +44,17 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getFotoAttribute () {
+        return (!empty($this->foto_usuario) ? (Storage::disk('public')->exists("usuarios/perfil/".$this->foto_usuario) ? Storage::url("usuarios/perfil/".$this->foto_usuario) : '') : '');
+    }
+
+    public function getBannerAttribute () {
+        return (!empty($this->banner_usuario) ? (Storage::disk('public')->exists("usuarios/banner/".$this->banner_usuario) ? Storage::url("usuarios/banner/".$this->banner_usuario) : '') : '');
+    }
+
+    public function cds(){
+        return $this->hasMany(Cd::class, 'user_id', 'id');
+    }
+
 }

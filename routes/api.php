@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CdController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\UsuarioController;
@@ -35,21 +36,21 @@ Route::post('/login', [LoginController::class, 'entrar']);
 Route::post('/registrar', [UsuarioController::class, 'registrar']);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+    $user = $request->user();
+    $user->append('foto', 'banner');
+    return $user;
 });
 
-Route::get('/test', function (){
-    $big = '8';
+Route::middleware('auth:api')->group(function(){
+    Route::post('/alterar-banner', [UsuarioController::class, 'alterarBanner']);
+    Route::post('/alterar-foto', [UsuarioController::class, 'alterarFoto']);
+    Route::post('/usuario-update', [UsuarioController::class, 'update']);
+    Route::get('/usuario/cds', [UsuarioController::class, 'cds']);
 
-    $small = &$big;
-
-    $small = "4$small";
-
-    echo "$big, $small";
+    
+    Route::post('/cds/upload/{cd_id}', [CdController::class, 'upload']);
+    Route::resource('/cds', CdController::class);
 });
-
-// Route::middleware('auth:api')->group(function(){
-// });
 
 //rotas de atualizações temporárias de implantação
 

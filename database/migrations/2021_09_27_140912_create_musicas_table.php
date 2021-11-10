@@ -22,6 +22,11 @@ class CreateMusicasTable extends Migration
             $table->integer('ordem');
             $table->unsignedBigInteger('cd_id');
             $table->timestamps();
+
+            $table->foreign('cd_id')
+            ->references('id')
+            ->on('cds')
+            ->onDelete('cascade');
         });
     }
 

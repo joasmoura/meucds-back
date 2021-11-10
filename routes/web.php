@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/atualizanomemusicas', [SiteController::class, 'atualizanomemusicas']);
 
+Route::get('/teste', function () {
+    echo 'teste';
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
