@@ -12,10 +12,6 @@ class Categoria extends Model
 
     protected $fillable = ['nome','icone', 'texto','url','ordem','bloqueio'];
 
-    public function artistas(){
-        return $this->hasMany(Artistas::class,'categoria_id','id');
-    }
-
     public function banners(){
         return $this->hasMany(Banner::class, 'categoria_id','id');
     }

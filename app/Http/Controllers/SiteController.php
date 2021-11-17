@@ -6,11 +6,11 @@ use App\Mail\recuperarSenha;
 use App\Mail\sucessoRecupercaoSenha;
 use App\Models\Banner;
 use App\Models\Artistas;
+use App\Models\User;
 use App\Models\Categoria;
 use App\Models\Cd;
 use App\Models\Musica;
 use App\Models\PasswordReset;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -59,41 +59,42 @@ class SiteController extends Controller
         return $categorias;
     }
 
-    public function artistas(Request $request, Artistas $model){
+    public function artistas(Request $request){
         if(!empty($request->categoria)){
-            $categoria = Categoria::where('url',$request->categoria)->first();
-
-            if($categoria){
-                $artistas = $categoria->artistas()->paginate(32);
-            }
+            $artistas = User::leftJoin('cds', 'users.id', 'cds.user_id')
+            ->leftJoin('categorias', 'cds.categoria_id', 'categorias.id')
+            ->where([
+                ['categorias.url', $request->categoria],
+                ['users.tipo', 'A']
+            ])
+            ->select('users.name', 'users.url')->groupBy('users.id')->paginate(32);
+            $artistas->append('foto');
         }else{
-            $artistas = $model->where('bloqueio','0')->paginate(32);
+            $artistas = User::where([
+                ['bloqueia_usuario','0'],
+                ['tipo', 'A']
+            ])->paginate(32);
+            $artistas->append('foto');
         }
-
-        if($artistas->first()){
-            foreach($artistas as $key => $artista){
-                $artistas[$key]['foto'] = $artista->foto('img200');
-            }
-        }
-
         return $artistas;
     }
 
-    public function artista($url, Artistas $model){
-        $artista = $model->where('url',$url)->first();
+    public function artista($url){
+        $artista = User::where('url',$url)->first();
         $musicas = [];
         $publicidade = [];
 
         if($artista){
-            $artista->foto = $artista->foto('img700');
+            $artista->append('foto');
+            $artista->append('banner');
             $cds = $artista->cds()->with('publicidade')->get();
-
+            $cds->append('capa_mini');
             if($cds){
                 foreach($cds as $key => $cd){
-                    $cd->capa_mini = $cd->capa_mini;
                     $cd->num_download += $cd->downloads()->sum('num_download');
                     $cd->num_play += $cd->reproducoes()->sum('num_play');
                     $mus = $cd->musicas()->get();
+                    $mus->append('link_musica');
 
                     $publicidades= $cd->publicidade()->get();
                     if($publicidades->first()){
@@ -106,13 +107,12 @@ class SiteController extends Controller
                         foreach($mus as $keym => $musica){
                             if($musica->link_musica){
                                 $musica->url = $artista->url.'/'.$cd->url.'/'.$musica->url;
-                                $musica->link_musica = $musica->link_musica;
                                 $mus[$keym] = $musica;
                             }else{
                                 unset($mus[$keym]);
                             }
                         }
-                        $cds[$key]->musicas = $mus;
+                        $cds[$key]['musicas'] = $mus;
                     }
 
                     $artista->cds = $cds;
@@ -157,7 +157,7 @@ class SiteController extends Controller
         $name = $request->cd.'.zip';
         $zipPath = public_path('/downloads'.DIRECTORY_SEPARATOR.$name);
 
-        $artista = Artistas::where('url',$request->artista)->first();
+        $artista = User::where('url',$request->artista)->first();
         
         if($artista){
             $cd = $artista->cds()->where('url', $request->cd)->first();

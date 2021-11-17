@@ -12,7 +12,7 @@ class Cd extends Model
     protected $table = 'cds';
     protected $fillable = [
         'artista', 'titulo', 'youtube', 'categoria_id', 'texto', 'img', 'status', 'url', 'data_publicacao',
-        'data_lancamento', 'lancamento', 'hora_publicacao', 'publicacao', 'tipo_publicacao', 'user_id'
+        'data_lancamento', 'lancamento', 'hora_publicacao', 'publicacao', 'tipo_publicacao', 'user_id','created_at'
     ];
 
     public function musicas(){
@@ -37,5 +37,9 @@ class Cd extends Model
 
     public function user(){
         return $this->hasOne(User::class, 'id','user_id');
+    }
+
+    public function artistas(){
+        return $this->hasMany(User::class,'id', 'user_id')->where('tipo', 'A');
     }
 }

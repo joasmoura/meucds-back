@@ -15,12 +15,19 @@ class CdController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
-        $cds = $user->cds()->paginate(10);
+        $cds = $user->cds()->with('downloads')->paginate(10);
         $cds->append('capa_mini');
+        if($cds->first()){
+            foreach($cds as $key => $cd){
+                $cds[$key]['num_download'] += $cd->downloads()->sum('num_download');
+                $cds[$key]['num_play'] += $cd->reproducoes()->sum('num_play');
+                $cds[$key]['data_cadastro'] = date('d/m/Y H:i', strtotime($cd->created_at));
+            }
+        }
 
         return $cds;
     }
@@ -75,7 +82,6 @@ class CdController extends Controller
             return response()->json([
                 'Não foi possível cadastrar seu cd!'
             ],Response::HTTP_NOT_FOUND);
-
         }
 
     }
@@ -93,7 +99,7 @@ class CdController extends Controller
                     $cd->musicas()->create([
                         'nome' => $musica->getClientOriginalName(),
                         'url' => $nome,
-                        'link' => $cd->link.'/'.$nome.$extensao,
+                        'link' => $cd->url.'/'.$nome.$extensao,
                         'ordem' => $cd->musicas()->count()+1
                     ]);
                 }
@@ -126,6 +132,7 @@ class CdController extends Controller
         if($cd){
             $musicas = $cd->musicas()->get();
             $musicas->append('link_musica');
+            $cd->append('capa_mini');
 
             if($musicas->first()){
                 foreach($musicas as $key => $m){
@@ -160,19 +167,13 @@ class CdController extends Controller
         $cd = Cd::find($id);
 
         if($cd){
-            $remover = Storage::deleteDirectory('musicas/'.$cd->url);
+            Storage::deleteDirectory('musicas/'.$cd->url);
             
-            if($remover){
-                $excluido = $cd->delete();
-                if($excluido){
-                    return response()->json([
-                        'status' => true
-                    ],Response::HTTP_OK);
-                }
-            } else {
+            $excluido = $cd->delete();
+            if($excluido){
                 return response()->json([
-                    'msg' => 'Não foi possível excluir os arquivos do cd!'
-                ],Response::HTTP_NOT_FOUND);
+                    'status' => true
+                ],Response::HTTP_OK);
             }
         }
     }

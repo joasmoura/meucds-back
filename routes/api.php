@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
+// Route::domain(env('APP_URL'))->group(function() {
 Route::get('/banners',[SiteController::class, 'banners']);
 Route::get('/categorias',[SiteController::class, 'categorias']);
 Route::get('/artistas',[SiteController::class, 'artistas']);

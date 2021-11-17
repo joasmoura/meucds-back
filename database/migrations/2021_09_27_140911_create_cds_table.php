@@ -19,7 +19,7 @@ class CreateCdsTable extends Migration
             $table->string('titulo');
             $table->string('youtube')->nullable();
             $table->text('url_download')->nullable();
-            $table->integer('nun_download')->nullable();
+            $table->integer('num_download')->nullable();
             $table->integer('num_play')->default(0);
             $table->integer('num_curtir')->default(0);
             $table->integer('num_descurtir')->default(0);
