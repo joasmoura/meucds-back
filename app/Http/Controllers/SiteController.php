@@ -67,13 +67,13 @@ class SiteController extends Controller
                 ['categorias.url', $request->categoria],
                 ['users.tipo', 'A']
             ])
-            ->select('users.name', 'users.url')->groupBy('users.id')->paginate(32);
+            ->select('users.name', 'users.url', 'users.foto_usuario')->groupBy('users.id')->paginate(32);
             $artistas->append('foto');
         }else{
             $artistas = User::where([
                 ['bloqueia_usuario','0'],
                 ['tipo', 'A']
-            ])->paginate(32);
+            ])->select('name', 'url', 'foto_usuario')->paginate(32);
             $artistas->append('foto');
         }
         return $artistas;
@@ -126,18 +126,32 @@ class SiteController extends Controller
         }
     }
 
-    public function artistas_letra($letra, Artistas $model){
-        $artistas = $model->where([
-            ['bloqueio','0'],
-            ['nome' ,'like', $letra.'%']
-        ])->paginate(32);
-
-        if($artistas->first()){
-            foreach($artistas as $key => $artista){
-                $artistas[$key]['foto'] = $artista->foto('img200');
-            }
+    public function divulgadores(Request $request){
+        if(!empty($request->categoria)){
+            $artistas = User::leftJoin('cds', 'users.id', 'cds.user_id')
+            ->leftJoin('categorias', 'cds.categoria_id', 'categorias.id')
+            ->where([
+                ['categorias.url', $request->categoria],
+                ['users.tipo', 'D']
+            ])
+            ->select('users.name', 'users.url', 'users.foto_usuario')->groupBy('users.id')->paginate(32);
+            $artistas->append('foto');
+        }else{
+            $artistas = User::where([
+                ['bloqueia_usuario','0'],
+                ['tipo', 'D']
+            ])->select('name', 'url', 'foto_usuario')->paginate(32);
+            $artistas->append('foto');
         }
+        return $artistas;
+    }
 
+    public function artistas_letra($letra, User $model){
+        $artistas = $model->where([
+            ['bloqueia_usuario','0'],
+            ['name' ,'like', $letra.'%']
+        ])->paginate(32);
+        $artistas->append('foto');
         return $artistas;
     }
 

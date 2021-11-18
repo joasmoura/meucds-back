@@ -23,6 +23,7 @@ Route::get('/banners',[SiteController::class, 'banners']);
 Route::get('/categorias',[SiteController::class, 'categorias']);
 Route::get('/artistas',[SiteController::class, 'artistas']);
 Route::get('/artista/{url}',[SiteController::class, 'artista']);
+Route::get('/divulgadores',[SiteController::class, 'divulgadores']);
 Route::get('/artistas-letra/{letra}',[SiteController::class, 'artistas_letra']);
 Route::post('/recuperar-senha', [SiteController::class, 'recuperarSenha']);
 Route::post('/verifica-token-recupera-senha', [SiteController::class, 'verificaTokenRecuperaSenha']);
@@ -46,9 +47,10 @@ Route::middleware('auth:api')->group(function(){
     Route::post('/alterar-foto', [UsuarioController::class, 'alterarFoto']);
     Route::post('/usuario-update', [UsuarioController::class, 'update']);
     Route::get('/usuario/cds', [UsuarioController::class, 'cds']);
-
     
     Route::post('/cds/upload/{cd_id}', [CdController::class, 'upload']);
+    Route::get('/cds/remover-capa/{id}', [CdController::class, 'removerCapa']);
+    Route::get('/cds/remover-musica/{id}', [CdController::class, 'removerMusica']);
     Route::resource('/cds', CdController::class);
 });
 

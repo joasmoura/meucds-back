@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CdFormRequest;
 use App\Models\Cd;
+use App\Models\Musica;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -48,11 +50,11 @@ class CdController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CdFormRequest $request)
     {
         $user = auth()->user();
         $salvo = $user->cds()->create([
-            'artista' => $request->artista,
+            'artista' => ($user->tipo === 'D' ? $request->artista : null),
             'titulo' => $request->titulo,
             'youtube' => $request->youtube,
             'categoria_id' => $request->categoria,
@@ -175,6 +177,37 @@ class CdController extends Controller
                     'status' => true
                 ],Response::HTTP_OK);
             }
+        }
+    }
+
+    public function removerMusica($id){
+        $musica = Musica::find($id);
+
+        if($musica) {
+            if(Storage::disk('public')->exists('musicas/'.$musica->link)):
+                $removida = Storage::delete('musicas/'.$musica->link);
+            endif;
+
+            $excluida = $musica->delete();
+            if($excluida){
+                return response()->json([
+                    'status' => true
+                ],Response::HTTP_OK);
+            }
+        }
+    }
+
+    public function removerCapa($id){
+        $cd = Cd::find($id);
+        if($cd){
+            if(Storage::disk('public')->exists('cds/'.$cd->img)):
+                $excluida = Storage::delete('cds/'.$cd->img);
+                if($excluida){
+                    return response()->json([
+                        'status' => true
+                    ],Response::HTTP_OK);
+                }
+            endif;
         }
     }
 }
